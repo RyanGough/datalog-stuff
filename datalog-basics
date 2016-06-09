@@ -1,0 +1,16 @@
+#lang datalog
+
+person(sally).
+person(jane).
+person(fred).
+
+parent(sally,fred).
+parent(fred,jane).
+
+ancestor(X,Y) :- parent(X,Y).
+ancestor(X,Y) :- parent(X,A), ancestor(A,Y).
+
+samePerson(X,Y) :- person(X), person(Y), X = Y.
+notSamePerson(X,Y) :- person(X), person(Y), X != Y.
+
+

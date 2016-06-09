@@ -1,0 +1,12 @@
+#lang datalog
+colour(red).
+colour(green).
+colour(yellow).
+colour(blue).
+different(X,Y) :- colour(X), colour(Y), X != Y.
+colourMap(Mis,Ala,Geo,Sca,Flo) :-
+  different(Mis,Ala),
+  different(Ala,Geo),
+  different(Geo,Sca),
+  different(Ala,Flo),
+  different(Geo,Flo).

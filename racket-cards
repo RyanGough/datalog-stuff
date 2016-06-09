@@ -1,0 +1,53 @@
+#lang datalog
+
+card(king).
+card(queen).
+card(jack).
+card(ace).
+
+hand(A,B,C) :- card(A), card(B), card(C).
+
+containsPair(A,B,C,P) :- hand(A,B,C), A = B, P = A.
+containsPair(A,B,C,P) :- hand(A,B,C), A = C, P = A.
+containsPair(A,B,C,P) :- hand(A,B,C), B = C, P = B.
+
+doesNotContainPair(A,B,C) :- hand(A,B,C), A != B, B != C, A != C.
+
+threeOfAKind(A,B,C) :- hand(A,B,C), A = B, B = C.
+
+notThreeOfAKind(A,B,C) :- hand(A,B,C), A != B.
+notThreeOfAKind(A,B,C) :- hand(A,B,C), A != C.
+notThreeOfAKind(A,B,C) :- hand(A,B,C), B != C.
+
+outRanks(ace, king).
+outRanks(king, queen).
+outRanks(queen, jack).
+
+ranksHigher(A,B) :- outRanks(A,B).
+ranksHigher(A,B) :- outRanks(A,C), ranksHigher(C,B).
+
+ranksSameOrHigher(A,B) :- ranksHigher(A,B).
+ranksSameOrHigher(A,B) :- card(A), card(B), A = B.
+
+highestCard(A,B,C,Res) :- hand(A,B,C), ranksSameOrHigher(A,B), ranksSameOrHigher(A,C), Res = A.
+highestCard(A,B,C,Res) :- hand(A,B,C), ranksSameOrHigher(B,A), ranksSameOrHigher(B,C), Res = B.
+highestCard(A,B,C,Res) :- hand(A,B,C), ranksSameOrHigher(C,A), ranksSameOrHigher(C,B), Res = C.
+
+winningHand(A,B,C,X,Y,Z,Res) :- threeOfAKind(A,B,C), notThreeOfAKind(X,Y,Z), Res = 1.
+winningHand(A,B,C,X,Y,Z,Res) :- threeOfAKind(X,Y,Z), notThreeOfAKind(A,B,C), Res = 2.
+winningHand(A,B,C,X,Y,Z,Res) :- threeOfAKind(A,B,C), threeOfAKind(X,Y,Z), outRanks(A,X), Res = 1.
+winningHand(A,B,C,X,Y,Z,Res) :- threeOfAKind(A,B,C), threeOfAKind(X,Y,Z), outRanks(X,A), Res = 2.
+winningHand(A,B,C,X,Y,Z,Res) :- notThreeOfAKind(A,B,C), notThreeOfAKind(X,Y,Z), containsPair(A,B,C,P), doesNotContainPair(X,Y,Z), Res = 1.
+winningHand(A,B,C,X,Y,Z,Res) :- notThreeOfAKind(A,B,C), notThreeOfAKind(X,Y,Z), containsPair(X,Y,Z,P), doesNotContainPair(A,B,C), Res = 2.
+winningHand(A,B,C,X,Y,Z,Res) :- notThreeOfAKind(A,B,C), notThreeOfAKind(X,Y,Z), containsPair(X,Y,Z,P), containsPair(A,B,C,Q), ranksHigher(P,Q), Res = 2.
+winningHand(A,B,C,X,Y,Z,Res) :- notThreeOfAKind(A,B,C), notThreeOfAKind(X,Y,Z), containsPair(X,Y,Z,P), containsPair(A,B,C,Q), ranksHigher(Q,P), Res = 1.
+winningHand(A,B,C,X,Y,Z,Res) :- doesNotContainPair(A,B,C), doesNotContainPair(X,Y,Z), highestCard(A,B,C,R1), highestCard(X,Y,Z,R2), ranksHigher(R1,R2), Res = 1.
+winningHand(A,B,C,X,Y,Z,Res) :- doesNotContainPair(A,B,C), doesNotContainPair(X,Y,Z), highestCard(A,B,C,R1), highestCard(X,Y,Z,R2), ranksHigher(R2,R1), Res = 2.
+
+
+
+
+
+
+
+
